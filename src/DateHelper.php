@@ -97,4 +97,18 @@ class DateHelper
     {
         return $when ? self::create($when, $tz)->format($format) : null;
     }
+
+    /**
+     * Returns true if the date value given looks like a date string. Does a very minimal check on the string format.
+     * If a DateTime object is given always returns true
+     *
+     * @param string|DateTime $when
+     *
+     * @return bool
+     */
+    public static function isDateLike($when): bool
+    {
+        if (!$when) return false;
+        return $when instanceof DateTime || preg_match('/^\d\d\d\d-\d\d-\d\d(T?\d\d:\d\d:\d\d)?/', $when);
+    }
 }
