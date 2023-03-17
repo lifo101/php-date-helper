@@ -86,6 +86,36 @@ class DateHelper
     }
 
     /**
+     * Returns -1,0,1 if left date is less than, equal or greater than the right.
+     *
+     * @param string|DateTime $left
+     * @param string|DateTime $right
+     * @return int
+     */
+    public static function cmp($left, $right)
+    {
+        $left = self::create($left);
+        $right = self::create($right);
+        if ($left == $right) return 0;
+        return $left < $right ? -1 : 1;
+    }
+
+    /**
+     * Snap the timestamp given to the interval specified.
+     *
+     * @param string|DateTime $dt
+     * @param int             $interval Interval, in seconds
+     *
+     * @return DateTime
+     */
+    public static function snap($dt, int $interval = 300): DateTime
+    {
+        $dt = self::create($dt);
+        $time = $dt->getTimestamp();
+        return self::create($time - $time % $interval + $interval, $dt->getTimezone());
+    }
+
+    /**
      * Return a date string based on the date given. If the date given is null|false, null is returned.
      *
      * @param string|DateTime   $when
