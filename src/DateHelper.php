@@ -12,12 +12,12 @@ class DateHelper
      * Create a DateTime object based on the time given. If it's invalid a default DateTime object of today's
      * date will be returned instead.
      *
-     * @param string|DateTime   $when
-     * @param DateTimeZone|null $tz
+     * @param DateTime|integer|string|null $when
+     * @param DateTimeZone|null            $tz
      *
      * @return DateTime
      */
-    public static function create($when = null, DateTimeZone $tz = null): DateTime
+    public static function create(DateTime|int|string|null $when = null, ?DateTimeZone $tz = null): DateTime
     {
         if ($when instanceof DateTime) {
             // todo; should this be cloned?
@@ -34,7 +34,7 @@ class DateHelper
         }
 
         // must explicitly set timezone if a unix timestamp was given
-        if ($tz && substr($when, 0, 1) == '@') {
+        if ($tz && str_starts_with($when, '@')) {
             $dt->setTimezone($tz);
         }
 
@@ -44,12 +44,12 @@ class DateHelper
     /**
      * Return the Sunday of the date given.
      *
-     * @param string|DateTime   $when
-     * @param DateTimeZone|null $tz
+     * @param DateTime|integer|string|null $when
+     * @param DateTimeZone|null            $tz
      *
      * @return DateTime
      */
-    public static function sunday($when = null, DateTimeZone $tz = null): DateTime
+    public static function sunday(DateTime|int|string|null $when = null, ?DateTimeZone $tz = null): DateTime
     {
         $dt = self::create($when, $tz)->setTime(0, 0);
         // if you 'last sunday' when we're already on sunday it'll skip back 1 more week
@@ -62,12 +62,12 @@ class DateHelper
     /**
      * Return the Saturday of the date given.
      *
-     * @param string|DateTime   $when
-     * @param DateTimeZone|null $tz
+     * @param DateTime|int|string|null $when
+     * @param DateTimeZone|null        $tz
      *
      * @return DateTime
      */
-    public static function saturday($when = null, DateTimeZone $tz = null): DateTime
+    public static function saturday(DateTime|int|string|null $when = null, ?DateTimeZone $tz = null): DateTime
     {
         return self::sunday($when, $tz)->modify('6 days');
     }
@@ -76,11 +76,11 @@ class DateHelper
      * Return a cloned instance of the date provided. Helper so user code doesn't have to clone and use the object in
      * two separate statements.
      *
-     * @param DateTime|string $dt
+     * @param DateTime|int|string|null $dt
      *
      * @return DateTime
      */
-    public static function copy($dt): DateTime
+    public static function copy(DateTime|int|string|null $dt): DateTime
     {
         return clone self::create($dt);
     }
@@ -88,11 +88,12 @@ class DateHelper
     /**
      * Returns -1,0,1 if left date is less than, equal or greater than the right.
      *
-     * @param string|DateTime $left
-     * @param string|DateTime $right
+     * @param DateTime|integer|string $left
+     * @param DateTime|integer|string $right
+     *
      * @return int
      */
-    public static function cmp($left, $right)
+    public static function cmp(DateTime|int|string $left, DateTime|int|string $right): int
     {
         $left = self::create($left);
         $right = self::create($right);
@@ -103,12 +104,12 @@ class DateHelper
     /**
      * Snap the timestamp given to the interval specified.
      *
-     * @param string|DateTime $dt
-     * @param int             $interval Interval, in seconds
+     * @param DateTime|integer|string $dt
+     * @param int                     $interval Interval, in seconds
      *
      * @return DateTime
      */
-    public static function snap($dt, int $interval = 300): DateTime
+    public static function snap(DateTime|int|string $dt, int $interval = 300): DateTime
     {
         $dt = self::create($dt);
         $time = $dt->getTimestamp();
@@ -118,13 +119,13 @@ class DateHelper
     /**
      * Return a date string based on the date given. If the date given is null|false, null is returned.
      *
-     * @param string|DateTime   $when
-     * @param DateTimeZone|null $tz
-     * @param string            $format
+     * @param DateTime|integer|string|null $when
+     * @param DateTimeZone|null            $tz
+     * @param string                       $format
      *
      * @return null|string
      */
-    public static function toDateString($when = null, DateTimeZone $tz = null, string $format = DATE_RFC3339): ?string
+    public static function toDateString(DateTime|int|string|null $when = null, ?DateTimeZone $tz = null, string $format = DATE_RFC3339): ?string
     {
         return $when ? self::create($when, $tz)->format($format) : null;
     }
@@ -133,11 +134,11 @@ class DateHelper
      * Returns true if the date value given looks like a date string. Does a very minimal check on the string format.
      * If a DateTime object is given always returns true
      *
-     * @param string|DateTime $when
+     * @param DateTime|int|string|null $when
      *
      * @return bool
      */
-    public static function isDateLike($when): bool
+    public static function isDateLike(DateTime|int|string|null $when): bool
     {
         if (!$when) return false;
         return $when instanceof DateTime || preg_match('/^\d\d\d\d-\d\d-\d\d(T?\d\d:\d\d:\d\d)?/', $when);
@@ -147,12 +148,12 @@ class DateHelper
      * Returns a human readable expression of the date interval given up to the total $parts specified.
      * Seconds are NOT included if years,mon or days are present.
      *
-     * @param DateInterval|DateTime|string $interval The date or interval to convert
-     * @param int                          $parts    Number of interval parts to include.
+     * @param DateInterval|DateTime|integer|string $interval The date or interval to convert
+     * @param int                                  $parts    Number of interval parts to include.
      *
      * @return string
      */
-    public static function timeAgo($interval, int $parts = 3): string
+    public static function timeAgo(DateInterval|DateTime|int|string $interval, int $parts = 3): string
     {
         if (!$interval instanceof DateInterval) {
             if (!$interval instanceof DateTime) {
@@ -186,20 +187,20 @@ class DateHelper
     /**
      * Returns a short time value depending on how long ago it was to the current time
      *
-     * @param DateTime|string $time   The time to convert
-     * @param string|null     $now    If null, the current time is used
-     * @param array|null      $format An array of formats to use for each time period.
-     *                                The keys are the time periods, and the values are the formats.
-     *                                The default is:
-     *                                [
-     *                                  'today' => 'g:i a',
-     *                                  'year'  => 'M j',
-     *                                  'other' => 'm/d/Y',
-     *                                ]
+     * @param DateTime|integer|string $time   The time to convert
+     * @param string|null             $now    If null, the current time is used
+     * @param array|null              $format An array of formats to use for each time period.
+     *                                        The keys are the time periods, and the values are the formats.
+     *                                        The default is:
+     *                                        <code>[
+     *                                        'today' => 'g:i a',
+     *                                        'year'  => 'M j',
+     *                                        'other' => 'm/d/Y',
+     *                                        ]</code>
      *
      * @return string
      */
-    public static function timeWhen($time, ?string $now = null, ?array $format = null): string
+    public static function timeWhen(DateTime|int|string $time, ?string $now = null, ?array $format = null): string
     {
         if (!($time instanceof DateTime)) {
             $time = date_create((string)$time) ?: date_create();
@@ -211,19 +212,12 @@ class DateHelper
             'year'  => 'M j',
             'other' => 'm/d/Y',
         ], $format ?? []);
-        switch (true) {
-            // TODAY: "3:00pm"
-            case ($time->format('Y-m-d') == $now->format('Y-m-d')):
-                $fmt = $format['today'];
-                break;
-            // THIS YEAR: "Jan 1"
-            case ($time->format('Y') == $now->format('Y')):
-                $fmt = $format['year'];
-                break;
-            // ANOTHER YEAR: "1/1/2022"
-            default:
-                $fmt = $format['other'];
-        }
+
+        $fmt = match (true) {
+            $time->format('Y-m-d') == $now->format('Y-m-d') => $format['today'], // TODAY: "3:00p"
+            $time->format('Y') == $now->format('Y') => $format['year'], // THIS YEAR: "Jan 1"
+            default => $format['other'], // ANOTHER YEAR: "1/1/2022"
+        };
         return $time->format($fmt);
     }
 }
