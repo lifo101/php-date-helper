@@ -12,8 +12,8 @@ class DateHelper
      * Create a DateTime object based on the time given. If it's invalid a default DateTime object of today's
      * date will be returned instead.
      *
-     * @param DateTime|integer|string|null $when
-     * @param DateTimeZone|null            $tz
+     * @param DateTime|int|string|null $when
+     * @param DateTimeZone|null        $tz
      *
      * @return DateTime
      */
@@ -44,8 +44,8 @@ class DateHelper
     /**
      * Return the Sunday of the date given.
      *
-     * @param DateTime|integer|string|null $when
-     * @param DateTimeZone|null            $tz
+     * @param DateTime|int|string|null $when
+     * @param DateTimeZone|null        $tz
      *
      * @return DateTime
      */
@@ -104,12 +104,12 @@ class DateHelper
     /**
      * Snap the timestamp given to the interval specified.
      *
-     * @param DateTime|integer|string $dt
-     * @param int                     $interval Interval, in seconds
+     * @param DateTime|int|string|null $dt
+     * @param int                      $interval Interval, in seconds
      *
      * @return DateTime
      */
-    public static function snap(DateTime|int|string $dt, int $interval = 300): DateTime
+    public static function snap(DateTime|int|string|null $dt, int $interval = 300): DateTime
     {
         $dt = self::create($dt);
         $time = $dt->getTimestamp();
@@ -119,9 +119,9 @@ class DateHelper
     /**
      * Return a date string based on the date given. If the date given is null|false, null is returned.
      *
-     * @param DateTime|integer|string|null $when
-     * @param DateTimeZone|null            $tz
-     * @param string                       $format
+     * @param DateTime|int|string|null $when
+     * @param DateTimeZone|null        $tz
+     * @param string                   $format
      *
      * @return null|string
      */
@@ -148,12 +148,12 @@ class DateHelper
      * Returns a human readable expression of the date interval given up to the total $parts specified.
      * Seconds are NOT included if years,mon or days are present.
      *
-     * @param DateInterval|DateTime|integer|string $interval The date or interval to convert
-     * @param int                                  $parts    Number of interval parts to include.
+     * @param DateInterval|DateTime|int|string|null $interval The date or interval to convert
+     * @param int                                   $parts    Number of interval parts to include.
      *
      * @return string
      */
-    public static function timeAgo(DateInterval|DateTime|int|string $interval, int $parts = 3): string
+    public static function timeAgo(DateInterval|DateTime|int|string|null $interval, int $parts = 3): string
     {
         if (!$interval instanceof DateInterval) {
             if (!$interval instanceof DateTime) {
@@ -187,20 +187,20 @@ class DateHelper
     /**
      * Returns a short time value depending on how long ago it was to the current time
      *
-     * @param DateTime|integer|string $time   The time to convert
-     * @param string|null             $now    If null, the current time is used
-     * @param array|null              $format An array of formats to use for each time period.
-     *                                        The keys are the time periods, and the values are the formats.
-     *                                        The default is:
-     *                                        <code>[
-     *                                        'today' => 'g:i a',
-     *                                        'year'  => 'M j',
-     *                                        'other' => 'm/d/Y',
-     *                                        ]</code>
+     * @param DateTime|int|string|null $time       The time to convert
+     * @param string|null              $now        If null, the current time is used
+     * @param array|null               $format     An array of formats to use for each time period.
+     *                                             The keys are the time periods, and the values are the formats.
+     *                                             The default is:
+     *                                             <code>[
+     *                                             'today' => 'g:i a',
+     *                                             'year'  => 'M j',
+     *                                             'other' => 'm/d/Y',
+     *                                             ]</code>
      *
      * @return string
      */
-    public static function timeWhen(DateTime|int|string $time, ?string $now = null, ?array $format = null): string
+    public static function timeWhen(DateTime|int|string|null $time, ?string $now = null, ?array $format = null): string
     {
         if (!($time instanceof DateTime)) {
             $time = date_create((string)$time) ?: date_create();
